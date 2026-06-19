@@ -1,0 +1,10 @@
+---
+roles:
+  - name: geerlingguy.nginx
+    src: geerlingguy.nginx
+  - name: geerlingguy.certbot
+    src: geerlingguy.certbot
+  - name: geerlingguy.postgresql
+    src: geerlingguy.postgresql
+  - name: stephdewit.nvm
+    src: stephdewit.nvm

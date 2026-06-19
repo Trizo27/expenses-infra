@@ -1,0 +1,29 @@
+---
+# Requirements:
+# geerlingguy.certbot
+
+- name: Certbot Web config playbook
+  hosts: vm
+  become: true
+
+  vars_files:
+    - "../vars/dev.yml"
+
+  tasks:
+    - name: Include geerlingguy.certbot role
+      ansible.builtin.include_role:
+        name: "../roles/geerlingguy.certbot"
+      vars:
+        certbot_auto_renew: true
+        certbot_auto_renew_user: root
+        certbot_auto_renew_hour: "00"
+        certbot_auto_renew_minute: "5"
+        certbot_auto_renew_options: "--quiet --no-self-upgrade"
+        certbot_create_if_missing: true
+        certbot_create_method: standalone
+        certbot_admin_email: root@42m.work
+        certbot_certs:
+          - domains:
+              - "{{ domain }}"
+        certbot_create_standalone_stop_services:
+          - nginx

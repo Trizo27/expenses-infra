@@ -1,0 +1,12 @@
+---
+- name: Install dependencies
+  become: true
+  become_user: root
+  ansible.builtin.package: # support for yum and dnf
+    name: "{{ packages }}"
+  vars:
+    packages:
+      - "@Development Tools"
+      - git
+      - curl
+      - openssl-devel

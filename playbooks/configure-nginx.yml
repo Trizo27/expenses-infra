@@ -1,0 +1,35 @@
+---
+# Requirements:
+# geerlingguy.nginx
+
+- name: Nginx Web config playbook
+  hosts: vm
+  become: true
+
+  vars_files:
+    - "../vars/dev.yml"
+
+  tasks:
+    - name: Installing nginx using geerlingguy.nginx role
+      ansible.builtin.include_role:
+        name: "../roles/geerlingguy.nginx"
+
+    - name: Generating nginx vhost config
+      ansible.builtin.template:
+        src: "../{{ base_folder }}/nginx.conf.j2"
+        dest: "/etc/nginx/sites-available/{{ domain }}.conf"
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Creating symbolic link
+      ansible.builtin.file:
+        src: "/etc/nginx/sites-available/{{ domain }}.conf"
+        dest: "/etc/nginx/sites-enabled/{{ domain }}.conf"
+        state: link
+        force: yes
+
+    - name: Restarting nginx service
+      ansible.builtin.service:
+        name: nginx
+        state: restarted

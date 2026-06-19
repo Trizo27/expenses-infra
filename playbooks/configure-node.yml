@@ -1,0 +1,58 @@
+---
+# Requirements:
+# stephdewit.nvm
+
+- name: Node Web config playbook
+  hosts: vm
+  become: true
+
+  vars_files:
+    - "../vars/dev.yml"
+
+  tasks:
+    # Node & Nvm
+    - name: Installing nvm using stephdewit.nvm role
+      ansible.builtin.include_role:
+        name: "../roles/stephdewit.nvm"
+      vars:
+        nvm_version: "{{ use_nvm_version }}"
+        nvm_node_version: "{{ use_nodejs_version }}"
+        nvm_install_path: ~/.nvm
+        nvm_shell_init_file: ~/.profile
+        nvm_force_install: false
+        nvm_install_deps: true
+      become: true
+      become_user: "{{ deploy_user }}"
+
+    - name: Updating the npm path for {{ deploy_user }} user
+      ansible.builtin.lineinfile:
+        path: "/home/{{ deploy_user }}/.bashrc"
+        insertafter: EOF
+        line: 'export PATH="$PATH:/home/{{ deploy_user }}/.nvm/versions/node/v{{ use_nodejs_version }}/bin"'
+        state: present
+
+    - name: Commenting out lines of non interactive shell for {{ deploy_user }} user
+      ansible.builtin.command: "sed -i '6,9 s/^/#/' /home/{{ deploy_user }}/.bashrc"
+      changed_when: false
+
+    # Supervisor
+    - name: Installing required packages
+      ansible.builtin.apt:
+        pkg:
+          - supervisor
+        state: present
+        update_cache: yes
+
+    - name: Supervisor config generate
+      ansible.builtin.template:
+        src: "../{{ base_folder }}/spendly-backend.conf.j2"
+        dest: "/etc/supervisor/conf.d/spendly-backend.conf"
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Restart supervisor service
+      ansible.builtin.service:
+        name: supervisor
+        state: restarted
+        enabled: true

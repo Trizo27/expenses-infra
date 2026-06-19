@@ -1,0 +1,9 @@
+[program:spendly-backend]
+command=/home/{{ deploy_user }}/.nvm/versions/node/v{{ use_nodejs_version }}/bin/node /var/www/{{ domain }}/back/src/index.js
+directory=/var/www/{{ domain }}/back
+user={{ deploy_user }}
+autostart=true
+autorestart=true
+stderr_logfile=/var/log/supervisor/spendly-backend.err.log
+stdout_logfile=/var/log/supervisor/spendly-backend.out.log
+environment=PORT="3000",DB_HOST="localhost",DB_PORT="5432",DB_NAME="{{ postgres_db_name }}",DB_USER="{{ postgres_db_user }}",DB_PASSWORD="{{ postgres_db_user_password }}"

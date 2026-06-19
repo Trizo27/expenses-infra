@@ -1,0 +1,48 @@
+---
+- name: Configure server playbook
+  hosts: vm
+  become: true
+
+  vars_files:
+    - "../vars/dev.yml"
+  vars:
+    users:
+      - {username: "{{ deploy_user }}", groups: "sudo"}
+
+  tasks:
+    - name: Create User
+      when: users[0].username | length > 0
+      block:
+        - name: Creating users accounts
+          ansible.builtin.user:
+            name: "{{ item.username }}"
+            groups: "{{ item.groups }}"
+            state: present
+            create_home: yes
+            shell: "{{ item.shell | default('/bin/bash') }}"
+            password_lock: yes
+          with_items: "{{ users }}"
+
+    - name: Crear directorio raiz del sitio
+      ansible.builtin.file:
+        path: /var/www/{{ domain }}
+        state: directory
+        owner: "{{ deploy_user }}"
+        group: www-data
+        mode: '0755'
+
+    - name: Crear directorio back
+      ansible.builtin.file:
+        path: /var/www/{{ domain }}/back
+        state: directory
+        owner: "{{ deploy_user }}"
+        group: www-data
+        mode: '0755'
+
+    - name: Crear directorio front
+      ansible.builtin.file:
+        path: /var/www/{{ domain }}/front
+        state: directory
+        owner: "{{ deploy_user }}"
+        group: www-data
+        mode: '0755'

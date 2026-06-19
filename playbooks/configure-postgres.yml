@@ -1,0 +1,29 @@
+---
+# Requirements:
+# geerlingguy.postgresql
+
+- name: Configure PostgreSQL server
+  hosts: vm
+  become: true
+
+  vars_files:
+    - "../vars/dev.yml"
+
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+
+  tasks:
+    - name: Including geerlingguy.postgresql role
+      ansible.builtin.include_role:
+        name: "../roles/geerlingguy.postgresql"
+      vars:
+        postgresql_databases:
+          - name: "{{ postgres_db_name }}"
+            owner: "{{ postgres_db_user }}"
+
+    - name: Adding password to postgres user
+      community.postgresql.postgresql_user:
+        name: postgres
+        password: "{{ postgres_db_user_password }}"
+      become: true
+      become_user: postgres

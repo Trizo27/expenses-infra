@@ -1,0 +1,23 @@
+---
+# General
+deploy_host: lab06.42m.work
+deploy_user: deploy
+domain: lab06.42m.work
+base_folder: "templates"
+
+# Node
+use_nvm_version: "0.39.2"
+use_nodejs_version: "20.19.3"
+
+# Nginx
+nginx_remove_default_vhost: true
+nginx_worker_processes: "auto"
+nginx_worker_connections: "1024"
+nginx_server_tokens: "off"
+nginx_keepalive_timeout: "65"
+nginx_keepalive_requests: "100"
+
+# PostgreSQL
+postgres_db_name: "expenses_db"
+postgres_db_user: "postgres"
+postgres_db_user_password: "postgres"
