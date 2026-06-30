@@ -17,13 +17,16 @@
       ansible.builtin.include_role:
         name: "../roles/geerlingguy.postgresql"
       vars:
+        postgresql_port: "{{ postgres_db_port }}"
         postgresql_databases:
           - name: "{{ postgres_db_name }}"
             owner: "{{ postgres_db_user }}"
+            port: "{{ postgres_db_port }}"
 
     - name: Adding password to postgres user
       community.postgresql.postgresql_user:
         name: postgres
         password: "{{ postgres_db_user_password }}"
+        login_port: "{{ postgres_db_port }}"
       become: true
       become_user: postgres

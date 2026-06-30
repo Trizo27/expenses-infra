@@ -11,18 +11,23 @@
 
   tasks:
     # Node & Nvm
-    - name: Installing nvm using stephdewit.nvm role
-      ansible.builtin.include_role:
-        name: "../roles/stephdewit.nvm"
-      vars:
-        nvm_version: "{{ use_nvm_version }}"
-        nvm_node_version: "{{ use_nodejs_version }}"
-        nvm_install_path: ~/.nvm
-        nvm_shell_init_file: ~/.profile
-        nvm_force_install: false
-        nvm_install_deps: true
+    - name: Installing nvm for {{ deploy_user }}
+      block:
+        - name: Installing nvm using stephdewit.nvm role
+          ansible.builtin.include_role:
+            name: "../roles/stephdewit.nvm"
+          vars:
+            nvm_version: "{{ use_nvm_version }}"
+            nvm_node_version: "{{ use_nodejs_version }}"
+            nvm_install_path: ~/.nvm
+            nvm_shell_init_file: ~/.profile
+            nvm_force_install: false
+            nvm_install_deps: true
       become: true
       become_user: "{{ deploy_user }}"
+      environment:
+        HOME: "/home/{{ deploy_user }}"
+      ignore_errors: true
 
     - name: Updating the npm path for {{ deploy_user }} user
       ansible.builtin.lineinfile:
